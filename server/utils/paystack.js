@@ -1,12 +1,22 @@
 const axios = require('axios');
 const Paystack = require('paystack')(process.env.PAYSTACK_SECRET_KEY);
 
+console.log('Paystack Service Active');
+
 class PaystackService {
+  static convertAmount(amount) {
+    const value = Number(amount);
+    if (Number.isNaN(value) || value <= 0) {
+      throw new Error('Invalid payment amount');
+    }
+    return Math.round(value * 100);
+  }
+
   static async initializeTransaction(email, amount, reference, metadata) {
     try {
       const response = await Paystack.transaction.initialize({
         email,
-        amount: amount * 100,
+        amount: PaystackService.convertAmount(amount),
         currency: 'GHS',
         reference,
         metadata,
@@ -32,14 +42,15 @@ class PaystackService {
 
   static async chargeMobileMoney(email, amount, mobileNumber, provider, reference, splitCode) {
     try {
+      const normalizedProvider = provider?.toLowerCase?.() || provider;
       const payload = {
         email,
-        amount: amount * 100,
+        amount: PaystackService.convertAmount(amount),
         reference,
         currency: 'GHS',
         mobile_money: {
           phone: mobileNumber,
-          provider
+          provider: normalizedProvider
         }
       };
 

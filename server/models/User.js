@@ -30,6 +30,17 @@ const userSchema = new mongoose.Schema({
     enum: ['student', 'owner', 'admin'],
     default: 'student'
   },
+  isApproved: {
+    type: Boolean,
+    default: false
+  },
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+  verificationToken: {
+    type: String
+  },
   favorites: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Property'

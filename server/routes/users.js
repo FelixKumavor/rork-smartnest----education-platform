@@ -2,18 +2,13 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
-const nodemailer = require('nodemailer');
+const checkApproval = require('../middleware/checkApproval');
+const adminAuth = require('../middleware/adminAuth');
+const { sendVerificationEmail } = require('../utils/mailer');
 
-// Email transporter
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
 
 // Onboarding route
 router.post('/onboarding', async (req, res) => {
@@ -47,37 +42,28 @@ router.post('/onboarding', async (req, res) => {
       pin: hashedPin
     });
 
+    const verificationToken = crypto.randomBytes(24).toString('hex');
+    user.verificationToken = verificationToken;
+    user.isApproved = false;
+    user.isVerified = false;
     await user.save();
 
-    // Send welcome email
-    const mailOptions = {
-      from: '"Smartnest Team" <' + process.env.EMAIL_USER + '>',
-      to: email,
-      subject: 'Welcome to Smartnest!',
-      html: `
-        <h1>Welcome to Smartnest, ${fullName}!</h1>
-        <p>Your account has been created successfully.</p>
-        <p>You can now browse and book student accommodations.</p>
-        <br>
-        <p>Best regards,<br>Smartnest Team</p>
-      `
-    };
-
     try {
-      await transporter.sendMail(mailOptions);
-      console.log(`Welcome email sent to: ${email}`);
+      await sendVerificationEmail(email, verificationToken);
     } catch (emailError) {
-      console.log("Email failed:", emailError);
-      // Don't fail the registration if email fails
+      console.log('Email failed:', emailError);
+      // Still allow registration even if email sending fails
     }
 
     res.status(201).json({
       success: true,
-      message: "Account created successfully",
+      message: "Account created successfully. Check your email to verify.",
       user: {
         id: user._id,
         fullName: user.fullName,
-        email: user.email
+        email: user.email,
+        isApproved: user.isApproved,
+        isVerified: user.isVerified
       }
     });
 
@@ -134,7 +120,9 @@ router.post('/login', async (req, res) => {
           fullName: user.fullName,
           email: user.email,
           role: user.role,
-          profileComplete: user.profileComplete
+          profileComplete: user.profileComplete,
+          isApproved: user.isApproved,
+          isVerified: user.isVerified
         }
       }
     });
@@ -149,7 +137,7 @@ router.post('/login', async (req, res) => {
 });
 
 // Get user profile
-router.get('/profile', auth, async (req, res) => {
+router.get('/profile', auth, checkApproval, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-pin');
 
@@ -168,7 +156,7 @@ router.get('/profile', auth, async (req, res) => {
 });
 
 // Update user profile
-router.put('/profile', auth, async (req, res) => {
+router.put('/profile', auth, checkApproval, async (req, res) => {
   try {
     const { fullName, phone, dob } = req.body;
 
@@ -198,6 +186,68 @@ router.put('/profile', auth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to update profile'
+    });
+  }
+});
+
+// Verify email from the link sent to the user
+router.get('/verify/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    const user = await User.findOne({ verificationToken: token });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired verification token'
+      });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    await user.save();
+
+    return res.json({
+      success: true,
+      message: 'Email verified successfully'
+    });
+  } catch (error) {
+    console.error('Email verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to verify email'
+    });
+  }
+});
+
+router.patch('/approve/:id', auth, adminAuth, async (req, res) => {
+  try {
+    const { approved } = req.body;
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    user.isApproved = approved === true || approved === 'true';
+    await user.save();
+
+    res.json({
+      success: true,
+      message: `User approval status updated to ${user.isApproved}`,
+      data: {
+        id: user._id,
+        isApproved: user.isApproved
+      }
+    });
+  } catch (error) {
+    console.error('Approve user error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update approval status'
     });
   }
 });

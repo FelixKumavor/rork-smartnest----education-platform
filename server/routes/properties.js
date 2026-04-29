@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Property = require('../models/Property');
 const auth = require('../middleware/auth');
+const checkApproval = require('../middleware/checkApproval');
 
 function adminAuth(req, res, next) {
   if (!req.user || req.user.role !== 'admin') {
@@ -124,7 +125,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Owner route: list properties uploaded by the signed-in owner
-router.get('/owner/list', auth, async (req, res) => {
+router.get('/owner/list', auth, checkApproval, async (req, res) => {
   try {
     const properties = await Property.find({ postedBy: req.user._id });
     res.json({
@@ -158,7 +159,7 @@ router.get('/admin/all', auth, adminAuth, async (req, res) => {
 });
 
 // Owner route: create a new property listing
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, checkApproval, async (req, res) => {
   try {
     const { title, description, price, location, images, amenities, roomType } = req.body;
 
@@ -248,7 +249,7 @@ router.delete('/:id', auth, adminAuth, async (req, res) => {
 });
 
 // Add to favorites
-router.post('/:id/favorite', auth, async (req, res) => {
+router.post('/:id/favorite', auth, checkApproval, async (req, res) => {
   try {
     const property = await Property.findById(req.params.id);
 
@@ -287,7 +288,7 @@ router.post('/:id/favorite', auth, async (req, res) => {
 });
 
 // Remove from favorites
-router.delete('/:id/favorite', auth, async (req, res) => {
+router.delete('/:id/favorite', auth, checkApproval, async (req, res) => {
   try {
     const user = req.user;
 
@@ -312,7 +313,7 @@ router.delete('/:id/favorite', auth, async (req, res) => {
 });
 
 // Get user's favorites
-router.get('/favorites/list', auth, async (req, res) => {
+router.get('/favorites/list', auth, checkApproval, async (req, res) => {
   try {
     const user = await req.user.populate('favorites');
 

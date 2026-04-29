@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const checkApproval = require('../middleware/checkApproval');
 const Transaction = require('../models/Transaction');
 const Property = require('../models/Property');
 const PaystackService = require('../utils/paystack');
@@ -12,7 +13,7 @@ function generateReference() {
 }
 
 // Initialize payment
-router.post('/initialize', auth, async (req, res) => {
+router.post('/initialize', auth, checkApproval, async (req, res) => {
   try {
     const { propertyId, amount } = req.body;
 
@@ -84,7 +85,7 @@ router.post('/initialize', auth, async (req, res) => {
 });
 
 // Charge with mobile money
-router.post('/charge', auth, async (req, res) => {
+router.post('/charge', auth, checkApproval, async (req, res) => {
   try {
     const { propertyId, amount, mobileNumber, provider } = req.body;
 
@@ -166,7 +167,7 @@ router.post('/charge', auth, async (req, res) => {
 });
 
 // Verify payment status
-router.get('/verify/:reference', auth, async (req, res) => {
+router.get('/verify/:reference', auth, checkApproval, async (req, res) => {
   try {
     const { reference } = req.params;
 
