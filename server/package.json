@@ -1,0 +1,26 @@
+{
+  "name": "smartnest-backend",
+  "version": "1.0.0",
+  "description": "Backend for Smartnest student housing platform",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "seed": "node seed.js",
+    "setup-paystack": "node setup-paystack.js",
+    "test-api": "node test-api.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.0.0",
+    "nodemailer": "^8.0.6",
+    "nodemon": "^3.0.0",
+    "paystack": "^2.0.1",
+    "socket.io": "^4.7.0"
+  }
+}
