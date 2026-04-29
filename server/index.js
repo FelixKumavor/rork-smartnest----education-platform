@@ -5,26 +5,13 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
+const { transporter } = require('./utils/mailer');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 
 const app = express();
 
-const mailTransporter = nodemailer.createTransport({
-  host: 'smtp.sendgrid.net',
-  port: 587,
-  auth: {
-    user: 'apikey',
-    pass: process.env.SENDGRID_API_KEY
-  }
-});
-
-app.set('mailTransporter', mailTransporter);
-
-mailTransporter.verify()
-  .then(() => console.log('SendGrid transporter is ready'))
-  .catch((err) => console.error('SendGrid transporter error:', err));
+app.set('mailTransporter', transporter);
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
