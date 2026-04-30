@@ -21,8 +21,12 @@
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
+    "expo": "^55.0.18",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^8.0.7"
+  },
+  "devDependencies": {
+    "@expo/ngrok": "^4.1.3"
   }
 }
