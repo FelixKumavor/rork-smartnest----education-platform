@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "start:clear": "expo start --clear",
     "start:tunnel": "expo start --tunnel",
     "start:web": "expo start --web",
     "start:web:tunnel": "expo start --web --tunnel",
