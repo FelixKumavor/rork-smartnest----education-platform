@@ -29,19 +29,17 @@ Backend API for the Smartnest student housing platform built with Node.js, Expre
    ```
 
 2. **Environment Variables:**
-   Copy the `.env` file and update the values:
+   Copy `.env.example` to `.env` and update the values:
    ```env
-   JWT_SECRET=your_jwt_secret
+   MONGODB_URI=mongodb://localhost:27017/smartnest
    PORT=5000
+   FRONTEND_URL=http://localhost:19006
+   JWT_SECRET=your_jwt_secret
+   PAYSTACK_SECRET_KEY=sk_test_your_paystack_secret
    EMAIL_USER=your_email@gmail.com
    EMAIL_PASS=your_app_password
-   PAYSTACK_SECRET_KEY=sk_test_your_paystack_secret
-   PAYSTACK_PUBLIC_KEY=pk_test_your_paystack_public
-   PAYSTACK_SPLIT_CODE=SPL_DEz6ryB9ed
-   MONGODB_URI=mongodb://localhost:27017/smartnest
-   FRONTEND_URL=http://localhost:8081
    ```
-
+   The backend connects to MongoDB and exposes API endpoints that the Expo frontend calls.
 3. **Setup Paystack:**
    Configure your Paystack account with subaccounts and splits:
    ```bash
