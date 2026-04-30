@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "main": "server/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-server": "node server/index.js",
+    "start-expo": "cd expo && npx expo start",
+    "start-expo:tunnel": "cd expo && npx expo start --tunnel",
+    "install-expo": "cd expo && npm install --legacy-peer-deps"
   },
   "repository": {
     "type": "git",
