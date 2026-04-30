@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "smartnest  & Education Platform",
-    "slug": "smart-nest-platform",
+    "name": "Smartnest Education Platform",
+    "slug": "smartnest-education-platform",
     "version": "1.0.0",
     "sdkVersion": "54.0.0",
     "orientation": "portrait",
@@ -16,14 +16,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.rork.property-education-platform"
+      "bundleIdentifier": "com.rork.propertyeducationplatform"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "app.rork.property-education-platform"
+      "package": "com.rork.propertyeducationplatform"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
