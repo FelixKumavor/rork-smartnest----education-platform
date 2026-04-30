@@ -36,6 +36,9 @@
         }
       ]
     ],
+    "packagerOpts": {
+      "hostType": "tunnel"
+    },
     "experiments": {
       "typedRoutes": true
     }
